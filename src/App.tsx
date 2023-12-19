@@ -1,32 +1,26 @@
 
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import {
-
-  useColorScheme,
-} from '@mui/material/styles';
+// import HomePage from 'pages/HomePage';
+import React from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import ProjectSchedulePage from './pages/ProjectSchedulePage';
 
 function App() {
 
-  function ModeToggle() {
-    const { mode, setMode } = useColorScheme();
+  function AppUI() {
     return (
-      <Button
-        onClick={() => {
-          setMode(mode === 'light' ? 'dark' : 'light');
-        }}
-      >
-        {mode === 'light' ? 'Turn dark' : 'Turn light'}
-      </Button>
+      <React.Fragment>
+        <BrowserRouter>
+          <Routes>
+            <Route path='/' element={<ProjectSchedulePage />} />
+          </Routes>
+        </BrowserRouter>
+      </React.Fragment>
     );
   }
 
   return (
     <>
-      <ModeToggle />
-      <Typography>
-        Haha
-      </Typography>
+      <AppUI/>
     </>
   );
 }
