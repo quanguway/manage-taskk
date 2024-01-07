@@ -19,7 +19,6 @@ import { Rotate } from 'src/components/atoms/Animate';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { useGetDates, useGetEndDateAllProject, useGetPeriods, useGetStartDateAllProject, useGetWidthCol } from 'src/pages/ProjectSchedulePage/services/hooks/useSchedule';
 import { useSnapGrid } from 'src/hooks/useSnapGrid';
-import ProjectTimeline from '../../molecules/TimelineTable/ProjectTimeline';
 
 
 const ScheduleTimeline = () => {
@@ -93,18 +92,29 @@ const ScheduleTimeline = () => {
           </HBox>
           <Collapsed isOpen={isOpen}>
             {scheduleData.map(project => (
-              <ProjectTimeline
+              <TimelineTable.Row
                 key={project.id}
-                colDates={datePeriods}
+                projectInfo={<ProjectInfo isOpen={false} key={project.id} {...project} />}
+                colDates={dates}
                 colSpanTimeLine={colSpanTimeLine}
                 containerRef={containerRef}
-                endDateAllProject={endDateAllProject}
-                project={project}
-                startDateAllProject={startDateAllProject}
-                timeScheduleColumns={timeScheduleColumns}
-                widthCol={widthCol}
-                projectInfo={<ProjectInfo isOpen={false} key={project.id} {...project} />}
-              />
+                timeScheduleColumns={timeScheduleColumns}>
+
+                <TimelineTable.MilestoneLine
+                  left={`${getCoorStart(startDateAllProject.format(DATE_FORMAT))}px`}
+                  top={0}
+                  width={`${getCoorVolumne(startDateAllProject.format(DATE_FORMAT), endDateAllProject.format(DATE_FORMAT))}px`}
+                  bgcolor={'blueviolet'} />
+
+                {project.phases.map((phases, index) => (
+                  <TimelineTable.MilestoneLine
+                    key={phases.id}
+                    left={`${getCoorStart(phases.start_date)}px`}
+                    top={(index + 1) * 6}
+                    width={`${getCoorVolumne(phases.start_date, phases.end_date)}px`}
+                    bgcolor={phases.color} />
+                ))}
+              </TimelineTable.Row>
             ))}
           </Collapsed>
 
