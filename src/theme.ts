@@ -1,19 +1,86 @@
-import { experimental_extendTheme as extendTheme } from '@mui/material';
+import Opacity from '@mui/icons-material/Opacity';
+import { CssVarsTheme, Theme, experimental_extendTheme as extendTheme } from '@mui/material';
 
+export type ThemeTypeMUI = Omit<Theme, 'palette'> & CssVarsTheme;
+declare module '@mui/material/styles' {
+  // declare Css Var root
+  interface CssVarsThemeOptions {
+    taskk: {
+      colSpanTimeSchedule: {
+        INFO: number,
+        DATE: number,
+        WEEK: number,
+      },
+      timelineSchedule: {
+        HEIGH_HEADER: string
+      },
+      colors: {
+        border: {
+          gray: string
+        },
+        tag: {
+          gray: string
+        }
+      }
+    }
+  }
+  interface CssVarsTheme {
+    taskk: {
+      colSpanTimeSchedule: {
+        INFO: number,
+        DATE: number,
+        WEEK: number,
+       },
+      timelineSchedule: {
+        HEIGH_HEADER: string
+      },
+      colors: {
+        border: {
+          gray: string
+        },
+        tag: {
+          gray: string
+        }
+      }
+    }
+  }
 
-// declare module '@mui/material/styles' {
-//   interface CssVarsThemeOptions {
-//     taskk: {
-//       colSpanTimeSchedule: {
-//         MEMBER: number,
-//         DATE: number,
-//         WEEK: number,
-//        },
-//     }
-//   }
-// }
+  // // declare palette color
+  // interface Palette {
+  //   colors: {
+  //     gray: {
+  //       light: string
+  //     }
+  //   }
+  // }
+  // interface PaletteOptions {
+  //   colors: {
+  //     gray: {
+  //       light: string
+  //     }
+  //   }
+  // }
+}
 
 const theme = extendTheme({
+  taskk:{
+    colSpanTimeSchedule: {
+      INFO: 9,
+      DATE: 1,
+      WEEK: 7,
+    },
+    timelineSchedule: {
+      HEIGH_HEADER: '44px'
+    },
+    colors: {
+      border: {
+        gray: '#e8e9f0'
+      },
+      tag: {
+        gray: '#e8e9f0'
+      }
+    }
+  },
   colorSchemes: {
     light: {
       palette: {
@@ -24,7 +91,7 @@ const theme = extendTheme({
           main: '#eff0ff'
         },
         text: {
-          primary: '#757ce8'
+          primary: '#000'
         }
       }
     },
@@ -66,6 +133,26 @@ const theme = extendTheme({
           fontSize: '13px',
           padding: '4px 12px'
         }
+      }
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        popper: {
+          color: '#3c4260',
+          opacity: 1
+        },
+        tooltip: {
+          color: '#fff',
+          opacity: 1
+        }
+      }
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: ({theme}) => ({
+          backgroundColor: theme.taskk.colors.tag.gray,
+          // color: '#fff'
+        })
       }
     }
   }

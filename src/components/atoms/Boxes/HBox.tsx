@@ -7,6 +7,8 @@ const HBox = ({...props}: HBoxProps ) => {
     <Box
       display={'flex'}
       flexDirection={'row'}
+      alignItems={'center'}
+      // justifyContent={'center'}
       {...props}
     >
 

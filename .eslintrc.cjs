@@ -6,6 +6,7 @@ module.exports = {
   'extends': [
     'eslint:recommended',
     'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
     'plugin:@typescript-eslint/recommended'
   ],
   'overrides': [
@@ -18,8 +19,9 @@ module.exports = {
     'react',
     '@typescript-eslint',
     'react-refresh',
+    'react-hooks',
     // @MUI eslint
-    'mui-path-imports'
+    'mui-path-imports',
   ],
   'rules': {
     'quotes': [

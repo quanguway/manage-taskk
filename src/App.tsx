@@ -3,6 +3,8 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import ProjectSchedulePage from './pages/ProjectSchedulePage';
+import { Provider } from 'react-redux';
+import store from './store';
 
 function App() {
 
@@ -20,7 +22,9 @@ function App() {
 
   return (
     <>
-      <AppUI/>
+      <Provider store={store}>
+        <AppUI />
+      </Provider>
     </>
   );
 }

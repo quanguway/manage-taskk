@@ -1,56 +1,152 @@
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import styled from '@emotion/styled';
 import moment from 'moment';
-import { taskk } from 'src/utils/constants';
-import { range } from 'lodash';
 import RadioButtonDate, { EPeriodOptions } from '../../molecules/RadioButtonDate';
-import { useMemo, useState } from 'react';
-import { DatePeriodType } from 'src/pages/ProjectSchedulePage/services/types/scheduleTimeline';
-import { getDatesArray } from 'src/utils/date';
+import { useCallback, useRef, useState } from 'react';
+import TimelineTable from '../../molecules/TimelineTable';
+import { HBox } from 'src/components/atoms/Boxes';
+import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
+import Collapsed from 'src/components/atoms/Animate/Collapsed';
+import Box from '@mui/material/Box';
+import DraggableItem from '../../DnD/DraggableItem';
+import Droppable from '../../DnD/Droppable';
+import { schedules } from 'src/mocks/schedule';
+import theme from 'src/theme';
+import { ProjectType } from 'src/pages/ProjectSchedulePage/services/types/scheduleTimeline';
+import { DATE_FORMAT } from 'src/utils/constants';
+import ProjectInfo from '../../molecules/TimelineTable/ProjectInfo';
+import Typography from '@mui/material/Typography';
+import { Rotate } from 'src/components/atoms/Animate';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { useGetDates, useGetEndDateAllProject, useGetPeriods, useGetStartDateAllProject, useGetWidthCol } from 'src/pages/ProjectSchedulePage/services/hooks/useSchedule';
+import { useSnapGrid } from 'src/hooks/useSnapGrid';
+import ProjectTimeline from '../../molecules/TimelineTable/ProjectTimeline';
+
 
 const ScheduleTimeline = () => {
+  const scheduleData: ProjectType[] = schedules;
 
-  const [optionDate, setOptionDate] = useState<EPeriodOptions>(EPeriodOptions.month);
+  const [optionDate, setOptionDate] = useState<EPeriodOptions>(EPeriodOptions.quarter);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const containerRef = useRef<any>();
 
-  const period: DatePeriodType = useMemo(() => ({
-    startDate: moment(),
-    endDate: moment().add(1, optionDate as moment.unitOfTime.DurationConstructor)
-  }), [optionDate]);
+  const startDateAllProject = useGetStartDateAllProject(scheduleData);
+  const { datePeriods, monthPeriods } = useGetPeriods(optionDate, moment());
+  const endDateAllProject = useGetEndDateAllProject(scheduleData);
+  const dates = useGetDates(startDateAllProject, optionDate);
+  const widthCol = useGetWidthCol(containerRef, dates);
+  const snapToGrid = useSnapGrid(widthCol);
 
-  console.log(period);
-  
-  console.log(getDatesArray(moment(), moment().add(4, 'day')));
-  
-  const startDate = moment();
-  const endDate = startDate.add(1, 'month');
+  const timeScheduleColumns = theme.taskk.colSpanTimeSchedule.INFO + (theme.taskk.colSpanTimeSchedule.DATE * datePeriods.length);
+  const colSpanTimeLine = theme.taskk.colSpanTimeSchedule.DATE * datePeriods.length;
 
-  const diffScheduleDate = endDate.diff(startDate, 'day');
-  const timeScheduleColumns = taskk.colSpanTimeSchedule.MEMBER + (taskk.colSpanTimeSchedule.DATE * diffScheduleDate);
+
+  const mouseSensor = useSensor(MouseSensor, {
+    // Require the mouse to move by 10 pixels before activating
+    activationConstraint: {
+      distance: 10,
+    },
+  });
+  const touchSensor = useSensor(TouchSensor, {
+    // Press delay of 250ms, with tolerance of 5px of movement
+    activationConstraint: {
+      delay: 500,
+      tolerance: 8,
+    },
+  });
+
+  const sensors = useSensors(mouseSensor, touchSensor);
+
+  const handleDrag = () => {
+  };
+
+  const getCoorStart = (date: string) => {
+    console.log(moment(date, DATE_FORMAT).diff(startDateAllProject, 'day'));
+    const startDate = moment(date, DATE_FORMAT).isBefore(moment()) ? moment() : moment(date, DATE_FORMAT);
+    console.log(startDate.format(), moment().format(), startDate.diff(moment(), 'day'));
+    
+    return startDate.diff(moment(), 'day') * widthCol;
+  };
+
+  const getCoorVolumne =(startDate: string, endDate: string) => {
+    console.log(startDate, endDate);
+    console.log(moment(endDate, DATE_FORMAT).diff(moment(startDate, DATE_FORMAT), 'day'));
+    
+    return moment(endDate, DATE_FORMAT).diff(moment(startDate, DATE_FORMAT), 'day') * widthCol;
+  };
 
   return (
     <>
-      <RadioButtonDate value={optionDate} setValue={setOptionDate}/>
+      <RadioButtonDate value={optionDate} setValue={setOptionDate} />
 
-      <Box sx={{ flexGrow: 1 }}>
-        <Grid columns={timeScheduleColumns} container>
-          <Grid item xs={taskk.colSpanTimeSchedule.MEMBER}>
-            <Item>Member</Item>
-          </Grid>
-          {range(period.startDate.get('date'), period.endDate.get('date')).map(time => (
-            <Grid key={time} item xs={taskk.colSpanTimeSchedule.DATE}>
-              <Item> {time} </Item>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
+      <DndContext modifiers={[snapToGrid]} onDragEnd={handleDrag} sensors={sensors}>
+        <TimelineTableStyled>
+          <TimelineTable.Header dates={datePeriods} periods={monthPeriods} />
+          <HBox onClick={() => setIsOpen(!isOpen)}
+            sx={{ width: '100%', height: '28px', cursor: 'pointer' }}
+            justifyContent={'flex-start'}
+            padding={1}
+            border={'1px solid'}>
+            <Rotate isRotate={isOpen} deg={90} >
+              <KeyboardArrowRightIcon />
+            </Rotate>
+            <Typography>Project ({scheduleData.length})</Typography>
+          </HBox>
+          <Collapsed isOpen={isOpen}>
+            {scheduleData.map(project => (
+              <ProjectTimeline
+                key={project.id}
+                colDates={datePeriods}
+                colSpanTimeLine={colSpanTimeLine}
+                containerRef={containerRef}
+                endDateAllProject={endDateAllProject}
+                project={project}
+                startDateAllProject={startDateAllProject}
+                timeScheduleColumns={timeScheduleColumns}
+                widthCol={widthCol}
+                projectInfo={<ProjectInfo isOpen={false} key={project.id} {...project} />}
+              />
+            ))}
+          </Collapsed>
+
+        </TimelineTableStyled>
+
+
+        <Box>
+          <DraggableItem data={{}} id='3' >
+
+            <Box>
+              game
+              <DndContext
+                sensors={sensors}>
+                <DraggableItem data={{}} id='4' >
+                  <Box border={'1px solid'}>
+                    change width
+                  </Box>
+                </DraggableItem>
+
+              </DndContext>
+            </Box>
+          </DraggableItem>
+        </Box>
+        <Box>
+          <Droppable data={{}} id='3' >
+            <Box border={'1px solid'}>
+              game
+            </Box>
+          </Droppable>
+        </Box>
+
+      </DndContext>
     </>
   );
 };
 
 export default ScheduleTimeline;
 
-const Item = styled(Paper)`
-  border: 1px solid;
+// const Item = styled(Paper)`
+//   border: 1px solid;
+// `;
+
+const TimelineTableStyled = styled(Box)`
+
 `;

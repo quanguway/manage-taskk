@@ -26,6 +26,6 @@
       "*": ["./*"]
     },
   },
-  "include": ["src", "jest.config.js"],
+  "include": ["src", "jest.config.js", "src/__tests__"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,4 +1,4 @@
-import { Moment } from 'moment';
+import moment, { Moment } from 'moment';
 import { DATE_FORMAT } from './constants';
 
 /**
@@ -17,7 +17,7 @@ export const getDateFormat = (date: Moment) => {
  * @param step number
  * @returns Moment[]
  */
-export const getDatesArray = (from: Moment, to: Moment, step?: number) => {
+export const getDatesArray = (from: Moment, to: Moment, step?: number, unit?: moment.unitOfTime.DurationConstructor) => {
   if(from.isAfter(to)) return [];
 
   if(from.isSame(to)) return [from];
@@ -25,9 +25,9 @@ export const getDatesArray = (from: Moment, to: Moment, step?: number) => {
   const date: Moment = from;
   const dates: Moment[] = [];
 
-  while(date.isSameOrBefore(to, 'date')) {
+  while(date.isSameOrBefore(to, 'day')) {
     dates.push(date.clone());
-    date.add(step ?? 1, 'day').clone();
+    date.add(step ?? 1, unit ?? 'day').clone();
   }
 
   return dates;
