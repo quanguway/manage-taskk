@@ -49,7 +49,7 @@ const RadioButtonDate = ({
         // aria-label='text alignment'
       >
         {periodOption.map(option => (
-          <ToggleButton key={option.value} value={option.value} aria-label='left aligned'>
+          <ToggleButton key={option.value} value={option.value}>
             {option.label}
           </ToggleButton>
         ))}
